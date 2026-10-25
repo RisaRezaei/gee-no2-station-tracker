@@ -3,6 +3,7 @@
 [![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-JavaScript-34A853?logo=googleearth&logoColor=white)](https://code.earthengine.google.com)
 [![Sentinel-5P](https://img.shields.io/badge/data-Sentinel--5P%20TROPOMI-0B5394)](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_OFFL_L3_NO2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23646385.svg)](https://doi.org/10.5281/zenodo.23646385)
 
 Track **tropospheric nitrogen dioxide (NO₂)** at air-quality monitoring stations with Sentinel-5P TROPOMI in Google Earth Engine. You get a multi-station time-series chart, a map of mean NO₂, and a tidy CSV ready for analysis in Python, R or Excel.
 
@@ -60,6 +61,12 @@ Track **tropospheric nitrogen dioxide (NO₂)** at air-quality monitoring statio
 ## Data
 
 Copernicus Sentinel-5P TROPOMI Level-3 NO₂ ([OFFL](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_OFFL_L3_NO2) / [NRTI](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_NRTI_L3_NO2)), European Space Agency / Copernicus.
+
+## Cite this tool
+
+Abbasalizadehrezaei, P. (2026). *NO2 Tracking at Air-Quality Stations* (Version 1.0.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.23646385
+
+GitHub also offers a ready-made citation under **Cite this repository** (from [CITATION.cff](CITATION.cff)).
 
 ## Author
 

@@ -10,5 +10,6 @@ authors:
 repository-code: "https://github.com/RisaRezaei/gee-no2-station-tracker"
 url: "https://risarezaei.github.io/tool.html?r=gee-no2-station-tracker"
 license: MIT
+doi: "10.5281/zenodo.23646385"
 version: 1.0.0
 date-released: "2026-10-25"

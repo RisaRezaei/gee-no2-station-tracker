@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "NO2 Tracking at Air-Quality Stations"
+abstract: "Google Earth Engine script for daily or monthly tropospheric NO2 time series from Sentinel-5P TROPOMI at many monitoring stations, with charts, a mean NO2 map and a tidy CSV export."
+type: software
+authors:
+  - family-names: Abbasalizadehrezaei
+    given-names: Parisa
+    orcid: "https://orcid.org/0009-0009-5708-7673"
+repository-code: "https://github.com/RisaRezaei/gee-no2-station-tracker"
+url: "https://risarezaei.github.io/tool.html?r=gee-no2-station-tracker"
+license: MIT
+version: 1.0.0
+date-released: "2026-10-25"

@@ -6,6 +6,10 @@
 
 Track **tropospheric nitrogen dioxide (NO₂)** at air-quality monitoring stations with Sentinel-5P TROPOMI in Google Earth Engine. You get a multi-station time-series chart, a map of mean NO₂, and a tidy CSV ready for analysis in Python, R or Excel.
 
+![Monthly NO2 series at an example station with the 2024 mean NO2 field](docs/preview.png)
+
+<sub>Example output: 2024 mean NO₂ around New York and the monthly series at one station (2019–2026), from Sentinel-5P in Earth Engine.</sub>
+
 ## What the script does
 
 | Step | Output |

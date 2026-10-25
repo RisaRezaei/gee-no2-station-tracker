@@ -1,123 +1,64 @@
-# StationAirTrack: Tracking NO₂ Pollution at Air Quality Stations
+# NO₂ Station Tracker
 
-## Overview
+[![Google Earth Engine](https://img.shields.io/badge/Google%20Earth%20Engine-JavaScript-34A853?logo=googleearth&logoColor=white)](https://code.earthengine.google.com)
+[![Sentinel-5P](https://img.shields.io/badge/data-Sentinel--5P%20TROPOMI-0B5394)](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_OFFL_L3_NO2)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**StationAirTrack** is a tool that allows users to track nitrogen dioxide (NO₂) pollution levels at specific air quality monitoring station locations using **Sentinel-5P TROPOMI** data within **Google Earth Engine (GEE)**. This tool visualizes NO₂ column density over a user-defined time period and generates a time series chart for pollution trends at different locations.
+Track **tropospheric nitrogen dioxide (NO₂)** at air-quality monitoring stations with Sentinel-5P TROPOMI in Google Earth Engine. You get a multi-station time-series chart, a map of mean NO₂, and a tidy CSV ready for analysis in Python, R or Excel.
 
----
+## What the script does
 
-## Code Explanation
+| Step | Output |
+|---|---|
+| Averages every TROPOMI overpass into daily or monthly means at each station (optionally within a buffer) | `ImageCollection` of NO₂ means |
+| Plots all stations on one chart | Console chart |
+| Maps the period-mean NO₂ field | Map layer |
+| Writes one row per station and time step | CSV in Google Drive |
 
-### 1. **Define the Point of Interest**
+## Quick start
 
-In this step, we define the geographic point (longitude, latitude) for the air quality station you want to monitor:
+1. Open the [Earth Engine Code Editor](https://code.earthengine.google.com).
+2. Paste [`no2_station_tracker.js`](no2_station_tracker.js) into a new script.
+3. Edit the `CONFIG` block (stations, dates, product, time step).
+4. Press **Run**, then start the export from the **Tasks** tab.
 
-```javascript
-var point = ee.Geometry.Point([-73.817694, 40.739264]);
-```
-* point: This line sets a geographic point of interest with latitude and longitude coordinates. In this case, the coordinates [-73.817694, 40.739264] correspond to a location in New York, USA. You can change these values to the coordinates of your own location.
+## Configuration
 
-### 2. Define the Time Range
+| Parameter | Default | Description |
+|---|---|---|
+| `stations` | one example station | List of `{name, lon, lat}` |
+| `STATIONS_ASSET` | `null` | Use a point `FeatureCollection` asset instead of the list |
+| `STATION_NAME_FIELD` | `'name'` | Property holding the station name in the asset |
+| `startDate` / `endDate` | `2019-01-01` / today | Analysis period (TROPOMI starts mid-2018) |
+| `product` | `'OFFL'` | `OFFL` (consistent archive, best for trends) or `NRTI` (near-real-time) |
+| `step` | `'month'` | `'day'` or `'month'` aggregation |
+| `bufferMeters` | `2000` | Averaging radius around each station; `0` = single pixel |
+| `exportToDrive` | `true` | Create the CSV export task |
 
-Next, we define the time period during which we want to analyze the NO₂ data. Here, we are setting the start and end dates:
+## Output
 
-```javascript
+`no2_station_timeseries.csv`
 
-var startDate = ee.Date('2018-07-01'); // Sentinel-5P TROPOMI data starts from July 2018
-var endDate = ee.Date(new Date()); // up to the current date
-```
-* startDate: We specify the start date for data collection. In this case, July 1, 2018.
+| column | description |
+|---|---|
+| `station` | station name |
+| `date` | `YYYY-MM` or `YYYY-MM-dd` |
+| `NO2_umol_m2` | mean tropospheric NO₂ column (µmol/m²) |
+| `n_overpasses` | number of TROPOMI images in that time step |
 
-* endDate: The end date is set to the current date (new Date()), meaning the most recent available data will be included.
+## Notes
 
-3. Load the Sentinel-5P NO₂ Data
+- The script uses the **tropospheric** NO₂ column, which is closer to near-surface pollution than the total column.
+- Values are converted from mol/m² to µmol/m² for readability (1 mol/m² = 10⁶ µmol/m²).
+- Cloud-affected pixels are already removed in the L3 product; time steps with no valid image are skipped.
+- Satellite column amounts are not the same as station surface concentrations, but their temporal patterns usually agree well.
 
-This part of the code loads the Sentinel-5P TROPOMI NO₂ dataset from the Google Earth Engine data catalog. It also applies filters to limit the data to the specific location and time range:
+## Data
 
-```javascript
-var collection = ee.ImageCollection('COPERNICUS/S5P/NRTI/L3_NO2')
-  .select('NO2_column_number_density')
-  .filterDate(startDate, endDate)
-  .filterBounds(point);
-```
-* select('NO2_column_number_density'): This filters the dataset to include only the NO₂ column density band, which measures NO₂ concentration in the vertical column of the atmosphere (mol/m²).
+Copernicus Sentinel-5P TROPOMI Level-3 NO₂ ([OFFL](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_OFFL_L3_NO2) / [NRTI](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S5P_NRTI_L3_NO2)), European Space Agency / Copernicus.
 
-* filterDate(startDate, endDate): Limits the data to the defined time range from startDate to endDate.
+## Author
 
-* filterBounds(point): Focuses the data on the geographic area around the defined point of interest.
+**Parisa Abbasalizadehrezaei** · [risarezaei.github.io](https://risarezaei.github.io)
 
-4. Create a Time Series Chart of NO₂ Column Density
-
-In this step, we create a time series chart that displays the average NO₂ concentration over time for the selected location:
-
-```javascript
-var chart = ui.Chart.image.series({
-  imageCollection: collection,
-  region: point,
-  reducer: ee.Reducer.mean(),
-  scale: 1000 // Adjust scale if necessary for the specific area
-});
-```
-* imageCollection: Specifies the source of the data, which is the NO₂ dataset filtered earlier.
-
-* region: Limits the data to the defined geographic point.
-
-* reducer: Uses ee.Reducer.mean() to calculate the average NO₂ column density for each image in the collection.
-
-* scale: Defines the spatial resolution (in meters) used to aggregate the data. You can adjust the scale depending on the area you're analyzing.
-
-5. Set Chart Options
-
-Now, we customize the appearance of the chart to make it more readable:
-```javascript
-chart.setOptions({
-  title: 'NO2 Column Density Time Series at a Specific Point (mol/m²)',
-  vAxis: {title: 'NO2 Column Density (mol/m²)'},
-  hAxis: {title: 'Date'},
-  lineWidth: 1,
-  pointSize: 3,
-});
-```
-* title: Specifies the title of the chart.
-    
-* vAxis and hAxis: These define the axis labels for NO₂ column density (mol/m²) and date, respectively.
-
-* lineWidth: Controls the width of the line in the chart.
-    
-* pointSize: Adjusts the size of the data points for better visibility.
-
-6. Display the Chart in the Console
-
-Finally, we display the generated time series chart in the Google Earth Engine console:
-```javascript
-
-print(chart);
-```
-* print(chart): Outputs the chart to the console, where you can visualize the NO₂ column density trend over time at the specified location.
-
-Summary
-
-The StationAirTrack tool allows users to visualize NO₂ pollution trends over time at specific geographic locations. Using Sentinel-5P TROPOMI data in Google Earth Engine, it generates a time series chart that shows the average NO₂ column density at the selected point of interest. This is helpful for monitoring air pollution and understanding environmental changes at different locations.
-Repository Structure
-
-```javascript
-StationAirTrack/
-  ├── README.md
-  ├── NO2_Tracking_Code.js
-  ├── examples/
-      └── sample_output_chart.png
-```
-
-* README.md: The documentation explaining the usage and functionality of the tool.
-
-* NO2_Tracking_Code.js: The full Google Earth Engine code for tracking NO₂ pollution.
-
-* examples/sample_output_chart.png: A sample output chart demonstrating the tool's capabilities.
-
-By following this structure, the StationAirTrack tool allows for easy tracking and visualization of NO₂ pollution trends, helping researchers and environmental scientists better understand air quality dynamics at specific locations.
-
-
----
-
-This structure ensures that the code is clearly separated from the explanation, making the repository more readable and easier to navigate. Each section is clearly defined with headings, and the code blocks are properly formatted using Markdown syntax, allowing for both explanation and code to coexist in a clean and user-friendly manner.
-
+Released under the [MIT License](LICENSE).
